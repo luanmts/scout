@@ -1,0 +1,100 @@
+# Local environment. Only the documented template is publishable.
+.env
+.env.*
+!.env.example
+
+# Operational state and backups. Keep only empty directory markers needed at startup.
+/backups/
+/storage/*
+!/storage/gmapsdata/
+/storage/gmapsdata/*
+!/storage/gmapsdata/.gitkeep
+/data/*
+!/data/raw/
+/data/raw/*
+!/data/raw/.gitkeep
+!/data/processed/
+/data/processed/*
+!/data/processed/.gitkeep
+
+# Defensive exclusions for databases, exports, credentials and encryption material
+# created outside their usual runtime directories.
+*.db
+*.db-*
+*.db.*
+*.sqlite
+*.sqlite-*
+*.sqlite.*
+*.sqlite3
+*.sqlite3-*
+*.sqlite3.*
+*.csv
+!samples/**/*.csv
+!tests/fixtures/**/*.csv
+*credential*.json*
+*oauth*.json*
+*token*.json*
+*secret*.json*
+*mail-accounts.enc*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+.auth/
+*.session
+*.session.json*
+
+# Local reports and commercial drafts based on real operations.
+/EXEMPLOS DE EMAILS.txt
+/docs/phase-2-results.md
+/docs/phase-3-panel.md
+/docs/phase-4a-contact-discovery.md
+/docs/phase-5b-outreach-studio.md
+/docs/clean-start-dry-run-2026-10-15.md
+/docs/cleanup-dry-run-2026-10-15.md
+
+# The Gosom checkout is a separate Git repository, not portfolio source.
+/upstream/google-maps-scraper/
+
+# Generated output, logs, screenshots, caches and local tools.
+/bin/
+/.tools/
+.cache/
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+/screenshots/
+*.log
+*.log.*
+*.trace.zip
+*.har
+*.tsbuildinfo
+.vite/
+.turbo/
+.npm/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Private local agent and MCP configuration, if added later.
+/.agents/
+/.codex/
+/.codex.json
+/.cursor/
+/.claude/
+/.mcp/
+/.mcp.json
+/.mcp.*.json
+/mcp.json
+/mcp.config.json
+/mcp.*.json
+!/.mcp.example.json

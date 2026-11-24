@@ -1,0 +1,6 @@
+The search bridge in scripts/harvey-search-bridge.py is based on the
+provider fallback, bounded retries, result parsing and URL deduplication in
+ethanplusai/harvey/harvey/agents/scout.py.
+
+Copyright (c) 2026 Ethan Rogers. The original Harvey project is distributed
+under the MIT License; see LICENSE in this directory.

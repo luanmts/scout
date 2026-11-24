@@ -1,0 +1,55 @@
+{
+  "name": "google-capture",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "tsx watch server/index.ts",
+    "dev:web": "vite",
+    "build": "tsc -b && vite build",
+    "check": "tsc -b --pretty false",
+    "check:frontend": "tsc -p tsconfig.app.json --noEmit --incremental false --pretty false",
+    "check:backend": "tsc -p tsconfig.server.json --noEmit --incremental false --pretty false",
+    "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts tests/*.test.mjs",
+    "test:python": ".venv/bin/python -B tests/harvey-search-bridge.test.py",
+    "test:lead-intelligence": "tsx --test tests/lead-intelligence.test.ts",
+    "test:website-intelligence": "tsx --test tests/website-intelligence.test.ts",
+    "test:icp-scoring": "tsx --test tests/icp-scoring.test.ts",
+    "test:contact-discovery": "tsx --test tests/contact-discovery.test.ts",
+    "test:contact-data-model": "tsx --test tests/contact-data-model.test.ts",
+    "test:cohort-engine": "tsx --test tests/cohort-engine.test.ts",
+    "test:outreach-policy": "tsx --test tests/outreach-policy.test.ts",
+    "test:mail-accounts": "tsx --test tests/mail-accounts.test.ts",
+    "test:search-extraction": "node --test tests/search-extraction.test.mjs",
+    "test:search-planning": "tsx --test tests/search-planning.test.ts",
+    "test:industry-catalog": "tsx --test tests/industry-catalog.test.ts",
+    "test:i18n": "tsx --test tests/i18n.test.ts",
+    "start": "tsx server/index.ts"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "lighthouse": "^13.5.0",
+    "lucide-react": "^0.468.0",
+    "playwright": "^1.64.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0"
+  },
+  "license": "MIT"
+}

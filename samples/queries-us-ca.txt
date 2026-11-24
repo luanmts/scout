@@ -1,0 +1,4 @@
+# Exemplos de escopo pequeno para validação manual: categoria + cidade + país.
+# Não execute os dois simultaneamente nesta etapa.
+independent coffee shops in Austin, Texas, United States #!#us-austin-coffee
+independent coffee shops in Toronto, Ontario, Canada #!#ca-toronto-coffee

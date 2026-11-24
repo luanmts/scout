@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import { translations, outreachTranslations, legacyUiTranslations, createTranslator, translateCount, formatDate, formatNumber, formatPercent, localizeMessage, localizeStatus, localizeOpportunityLevel, localizeOpportunityReason, localizeQualificationReason, localizeQualificationStage } from "../src/i18n";
+
+const englishKeys = Object.keys(translations.en).sort();
+const portugueseKeys = Object.keys(translations["pt-BR"]).sort();
+assert.deepEqual(portugueseKeys, englishKeys, "pt-BR must define every English UI key");
+assert.deepEqual(Object.keys(outreachTranslations["pt-BR"]).sort(), Object.keys(outreachTranslations.en).sort(), "Outreach copy must cover both locales");
+assert.ok(Object.entries(legacyUiTranslations).every(([source, translated]) => source.length > 0 && translated.length > 0), "legacy UI copy must not have empty translations");
+assert.equal(createTranslator("pt-BR")("campaigns"), "Campanhas");
+assert.equal(createTranslator("en")("languageRegion"), "Language & region");
+assert.equal(createTranslator("pt-BR")("languageRegion"), "Idioma e região");
+assert.equal(createTranslator("pt-BR")("concurrentDiscoveries", { count: 2 }), "2 descobertas simultâneas");
+assert.equal(createTranslator("pt-BR")("missing.key"), "missing.key");
+assert.equal(createTranslator("pt-BR")("templateHint"), "Use {{company}}, {{category}} ou {{city}}.");
+assert.equal(translateCount("pt-BR", 1, { one: "rulesCountOne", other: "rulesCountOther" }), "1 regra");
+assert.equal(translateCount("en", 2, { one: "rulesCountOne", other: "rulesCountOther" }), "2 rules");
+assert.equal(localizeStatus("pt-BR", "completed_with_shortfall"), "Cobertura esgotada");
+assert.equal(localizeMessage("pt-BR", "Request failed."), "Falha na requisição.");
+assert.match(formatNumber(1234, "pt-BR"), /1[.]234|1 234/);
+assert.equal(formatPercent(0.25, "en"), "25%");
+assert.ok(formatDate("2026-10-16T12:00:00Z", "pt-BR"));
+assert.equal(localizeOpportunityLevel("pt-BR", "high"), "Alta oportunidade");
+assert.equal(localizeOpportunityLevel("pt-BR", "insufficient_evidence"), "Evidência insuficiente");
+assert.match(localizeOpportunityReason("pt-BR", "Weighted verified homepage issues only; no financial impact is inferred."), /problemas verificados/);
+assert.equal(localizeQualificationStage("pt-BR", "website_audit"), "Auditoria do site");
+assert.equal(localizeQualificationReason("pt-BR", "Public website access is restricted."), "O acesso público ao site está restrito.");
+console.log("i18n coverage tests passed");
