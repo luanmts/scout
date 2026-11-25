@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import test from "node:test";
-import { classifyContactFetchFailure, dedupePublicContacts, discoverWebsiteLinks, extractPublicContacts, mergeWebsiteContactPages, normalizeEmail, normalizeSocial } from "../server/contact-discovery.ts";
+import { classifyContactFetchFailure, dedupePublicContacts, discoverWebsiteLinks, extractPublicContacts, mergeWebsiteContactPages, normalizeEmail, normalizeSocial, resolveContactSearchBridgePath } from "../server/contact-discovery.ts";
+
+test("contact bridge uses the renamed default and preserves the old configured bundled path", () => {
+  const root = process.cwd();
+  assert.equal(resolveContactSearchBridgePath(undefined, root), join(root, "scripts", "contact-search-bridge.py"));
+  assert.equal(resolveContactSearchBridgePath(join(root, "scripts", "harvey-search-bridge.py"), root), join(root, "scripts", "contact-search-bridge.py"));
+  const customPath = join(root, "custom-contact-bridge.py");
+  assert.equal(resolveContactSearchBridgePath(customPath, root), customPath);
+});
 
 test("extracts public emails, phones, social profiles and role evidence", () => {
   const result = extractPublicContacts(`<section><h2>Maria Silva - Founder</h2><p>Contact: MARIA@Example.test</p><p>+1 (416) 555-0199</p><a href="https://www.linkedin.com/in/maria-silva">LinkedIn</a><a href="https://www.instagram.com/example-business">Instagram</a></section>`);

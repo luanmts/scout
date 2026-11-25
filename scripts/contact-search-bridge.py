@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Harvey web-search bridge.
+"""Scout optional contact-search bridge.
 
 This is the search backend portion of ethanplusai/harvey's Scout agent,
-preserved locally under the upstream MIT license. It intentionally exposes
-only search: Google Capture keeps its own identity checks, page extraction,
+preserved here under the upstream MIT license. It intentionally exposes
+only search: Scout keeps its own identity checks, page extraction,
 deduplication, queue and persistence.
 """
 
@@ -37,10 +37,10 @@ BLOCK_MARKERS = (
     "detected unusual activity", "access denied", "/sorry/index",
 )
 GOOGLE_JS_RETRY_MARKERS = ("/httpservice/retry/enablejs", "enablejs", "redirecionamento não iniciar")
-logger = logging.getLogger("google_capture.harvey_search")
+logger = logging.getLogger("scout.contact_search_bridge")
 
 
-class HarveyWebSearcher:
+class ContactSearchClient:
     """Direct port of Scout's provider fallback and bounded HTTP behavior."""
 
     def __init__(self):
@@ -137,7 +137,7 @@ class HarveyWebSearcher:
     def dedupe(results):
         seen, output = set(), []
         for url, snippet, title in results:
-            normalized = HarveyWebSearcher.normalize_result_url(url)
+            normalized = ContactSearchClient.normalize_result_url(url)
             if not normalized or normalized in seen:
                 continue
             seen.add(normalized)
@@ -279,7 +279,7 @@ async def main():
     payload = json.load(sys.stdin)
     queries = payload.get("queries", [])[:MAX_QUERIES_PER_CYCLE]
     context = payload.get("context", {}) if isinstance(payload.get("context", {}), dict) else {}
-    searcher = HarveyWebSearcher()
+    searcher = ContactSearchClient()
     results = [await searcher.web_search(query, context) for query in queries if isinstance(query, str) and query.strip()]
     json.dump({"queries": results, "attempts": searcher.attempts, "providers": searcher.provider_diagnostics}, sys.stdout)
 

@@ -15,7 +15,7 @@
     "check:frontend": "tsc -p tsconfig.app.json --noEmit --incremental false --pretty false",
     "check:backend": "tsc -p tsconfig.server.json --noEmit --incremental false --pretty false",
     "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts tests/*.test.mjs",
-    "test:python": ".venv/bin/python -B tests/harvey-search-bridge.test.py",
+    "test:python": ".venv/bin/python -B tests/contact-search-bridge.test.py",
     "test:lead-intelligence": "tsx --test tests/lead-intelligence.test.ts",
     "test:website-intelligence": "tsx --test tests/website-intelligence.test.ts",
     "test:icp-scoring": "tsx --test tests/icp-scoring.test.ts",

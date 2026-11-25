@@ -459,7 +459,7 @@ function seedSkills() {
   const now = new Date().toISOString();
   const insert = db.prepare("INSERT OR IGNORE INTO skills (id, slug, name, source, attribution, content, service_scope, enabled, editable, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?)");
   for (const [slug, name, source, serviceScope] of skillSeeds) {
-    const path = join(root, "skills", "harvey", `${slug}.md`);
+    const path = join(root, "skills", "sales-intelligence", `${slug}.md`);
     if (!existsSync(path)) continue;
     const content = readFileSync(path, "utf8");
     insert.run(randomUUID(), slug, name, source, source === "harvey" ? "Imported from ethanplusai/harvey under the MIT License." : "Scout local overlay.", content, serviceScope, now, now);

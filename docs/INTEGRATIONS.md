@@ -14,7 +14,7 @@ Website intelligence uses Playwright with Chromium and Lighthouse. It audits the
 
 ## Optional contact search
 
-Contact discovery can inspect publicly available pages on company websites. An optional adapter can supplement that process with a public search provider. The safe `.env.example` selects `CONTACT_SEARCH_PROVIDER=none`; enabling a provider may require a provider key and can incur costs. Python bridge dependencies are declared in `scripts/requirements-harvey-search.txt`. The isolated Python setup was validated in a clean project copy and its 7 tests passed; see [Installation](INSTALLATION.md#optional-python-bridge).
+Contact discovery can inspect publicly available pages on company websites. An optional adapter can supplement that process with a public search provider. The safe `.env.example` selects `CONTACT_SEARCH_PROVIDER=none`; enabling a provider may require a provider key and can incur costs. Python bridge dependencies are declared in `scripts/requirements-contact-search.txt`. The isolated Python setup was validated in a clean project copy and its 7 tests passed; see [Installation](INSTALLATION.md#optional-python-bridge).
 
 ## AI-assisted drafts
 

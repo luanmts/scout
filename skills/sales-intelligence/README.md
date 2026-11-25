@@ -1,4 +1,4 @@
-# Harvey Sales Skills Library
+# Scout Sales Intelligence Skills
 
 The nine framework files in this directory are imported from [`ethanplusai/harvey`](https://github.com/ethanplusai/harvey), preserved under the MIT License. See `LICENSE` for the required attribution.
 

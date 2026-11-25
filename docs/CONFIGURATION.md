@@ -9,6 +9,8 @@ Copy `.env.example` to `.env` for local overrides. The template contains safe va
 | `GMS_IMAGE` | Docker Compose image used by Scout Engine. | Defaults to `gosom/google-maps-scraper:latest`; pin a tested release for repeatability. |
 | `GMS_BIND_ADDRESS`, `GMS_HOST_PORT`, `GMS_DATA_DIR` | Compose bind address, host port, and persisted Scout Engine data. | Loopback, port 8080, `./storage/gmapsdata`. |
 | `CONTACT_SEARCH_PROVIDER` | Optional external contact-search adapter selection. | `none` in the safe template. |
+| `HARVEY_SEARCH_BRIDGE`, `HARVEY_PYTHON`, `HARVEY_SEARCH_DELAY_MIN` | Existing optional bridge path, interpreter, and Python-side delay overrides. | Names remain supported for local configuration compatibility; unset path uses `scripts/contact-search-bridge.py` and `python3`. The former bundled bridge path is redirected to the renamed file. |
+| `HARVEY_SEARCH_BRIDGE`, `HARVEY_PYTHON` | Existing overrides for the optional Python bridge path and interpreter. | Kept for compatibility; when the path is unset, Scout uses `scripts/contact-search-bridge.py`, with `python3` as the interpreter default. The former bundled script path is redirected to the renamed file. |
 | `SERPER_API_KEY` | Optional Serper adapter credential. | Not set; provider usage may incur charges. |
 | `WEBSITE_AUDIT_CHROMIUM_PATH` | Explicit Chromium executable for audits. | Optional if browser discovery succeeds. |
 | `IMPORT_LEAD_LIMIT` | Local import safety limit per completed result job. | `250`; backend clamps accepted range. |

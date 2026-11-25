@@ -1,4 +1,4 @@
-The search bridge in scripts/harvey-search-bridge.py is based on the
+The search bridge in scripts/contact-search-bridge.py is based on the
 provider fallback, bounded retries, result parsing and URL deduplication in
 ethanplusai/harvey/harvey/agents/scout.py.
 

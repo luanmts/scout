@@ -28,7 +28,7 @@ const obfuscatedEmailPattern = /\b([A-Z0-9._%+-]+)\s*(?:@|\[\s*at\s*\]|\(\s*at\s
 // Reused from Harvey's Scout company-inbox backfill
 // (ethanplusai/harvey, MIT License): only published general inboxes are
 // preferred as a commercial fallback; person-name addresses are not guessed.
-const HARVEY_INBOX_PREFERRED = ['owner', 'office', 'info', 'contact', 'contactus', 'hello', 'team', 'service', 'sales', 'estimates', 'quotes', 'inquiries', 'enquiries', 'admin', 'support'] as const;
+const PREFERRED_GENERAL_INBOX_LOCALS = ['owner', 'office', 'info', 'contact', 'contactus', 'hello', 'team', 'service', 'sales', 'estimates', 'quotes', 'inquiries', 'enquiries', 'admin', 'support'] as const;
 const instagramPattern = /https?:\/\/(?:www\.)?instagram\.com\/([a-zA-Z0-9._-]{1,30})\/?/gi;
 const facebookPattern = /https?:\/\/(?:www\.)?(?:facebook\.com|fb\.com)\/([a-zA-Z0-9.\-_/]+)\/?/gi;
 const linkedinPattern = /https?:\/\/(?:www\.)?linkedin\.com\/(?:in|company)\/([a-zA-Z0-9._%-]+)\/?/gi;
@@ -391,25 +391,33 @@ export function publicSearchQueries(lead: PublicLead) {
   ])].slice(0, 4);
 }
 
-type HarveySearchResult = { url: string; title: string; snippet: string };
-type HarveySearchResponse = { queries: Array<{ query: string; provider: string; results: HarveySearchResult[] }>; attempts: Array<{ provider: string; url?: string; error?: string }>; providers?: Array<{ provider: string; rawResults: number; validUrls: number; relevantSources: number; accepted: boolean; error?: string }> };
+type PublicSearchResult = { url: string; title: string; snippet: string };
+type PublicSearchResponse = { queries: Array<{ query: string; provider: string; results: PublicSearchResult[] }>; attempts: Array<{ provider: string; url?: string; error?: string }>; providers?: Array<{ provider: string; rawResults: number; validUrls: number; relevantSources: number; accepted: boolean; error?: string }> };
 
-async function searchWithHarvey(lead: PublicLead): Promise<HarveySearchResponse> {
-  const bridge = process.env.HARVEY_SEARCH_BRIDGE ?? join(process.cwd(), 'scripts', 'harvey-search-bridge.py');
+export function resolveContactSearchBridgePath(configuredPath?: string, workingDirectory = process.cwd()) {
+  const defaultPath = join(workingDirectory, 'scripts', 'contact-search-bridge.py');
+  const previousBundledPath = join(workingDirectory, 'scripts', 'harvey-search-bridge.py');
+  if (!configuredPath) return defaultPath;
+  if (resolve(workingDirectory, configuredPath) === resolve(previousBundledPath) && !existsSync(resolve(workingDirectory, configuredPath))) return defaultPath;
+  return configuredPath;
+}
+
+async function searchWithContactBridge(lead: PublicLead): Promise<PublicSearchResponse> {
+  const bridge = resolveContactSearchBridgePath(process.env.HARVEY_SEARCH_BRIDGE);
   const python = process.env.HARVEY_PYTHON ?? 'python3';
   try {
     const { stdout } = await new Promise<{ stdout: string }>((resolve, reject) => {
       const child = execFile(python, [bridge], { timeout: 90_000, maxBuffer: 2_000_000, env: process.env }, (error, output) => error ? reject(error) : resolve({ stdout: output }));
       child.stdin?.end(JSON.stringify({ queries: publicSearchQueries(lead).slice(0, 3), context: { name: lead.title, city: lead.city, region: lead.region, domain: officialDomain(lead) } }));
     });
-    const parsed = JSON.parse(stdout) as HarveySearchResponse;
+    const parsed = JSON.parse(stdout) as PublicSearchResponse;
     return { queries: Array.isArray(parsed.queries) ? parsed.queries : [], attempts: Array.isArray(parsed.attempts) ? parsed.attempts : [], providers: Array.isArray(parsed.providers) ? parsed.providers : [] };
   } catch (error) {
     return { queries: [], attempts: [{ provider: 'bridge', error: error instanceof Error ? error.message : 'Harvey search bridge failed.' }], providers: [] };
   }
 }
 
-async function discoverFromSearchResults(lead: PublicLead, search: HarveySearchResponse): Promise<ContactDiscovery> {
+async function discoverFromSearchResults(lead: PublicLead, search: PublicSearchResponse): Promise<ContactDiscovery> {
   const rankedResults = search.queries.flatMap((item) => item.results)
     .filter((item, index, all) => all.findIndex((other) => other.url === item.url) === index)
     .map((item) => ({ ...item, match: identityMatch(lead, `${item.title} ${item.snippet}`, item.url) }))
@@ -452,8 +460,8 @@ async function discoverFromSearchResults(lead: PublicLead, search: HarveySearchR
   return { email: best?.email ?? '', instagram: unique.find((item) => item.socialNetwork === 'instagram')?.socialUrl ?? '', facebook: unique.find((item) => item.socialNetwork === 'facebook')?.socialUrl ?? '', status: best?.status === 'verified' ? 'verified' : best ? 'possible' : 'not_found', sourceUrl: best?.sourceUrl ?? unique[0]?.sourceUrl ?? '', confidence: best ? Math.round(best.confidence * 100) : 0, error: [attempts, metrics, `Harvey providers: ${providers}.`].filter(Boolean).join(' | '), origin: 'public_search', diagnostic, contacts: unique };
 }
 
-async function discoverFromHarveySearch(lead: PublicLead): Promise<ContactDiscovery> {
-  return discoverFromSearchResults(lead, await searchWithHarvey(lead));
+async function discoverFromPublicSearch(lead: PublicLead): Promise<ContactDiscovery> {
+  return discoverFromSearchResults(lead, await searchWithContactBridge(lead));
 }
 
 export function parsePublicSearchResults(html: string): SearchResult[] {
@@ -477,8 +485,8 @@ export function selectBestContactEmail(contacts: PublicContact[], officialDomain
   const normalizedOfficialDomain = officialDomainValue.replace(/^www\./i, '').toLowerCase();
   const inboxRank = (contact: PublicContact) => {
     const local = normalizeEmail(contact.email).split('@')[0];
-    const rank = HARVEY_INBOX_PREFERRED.indexOf(local as typeof HARVEY_INBOX_PREFERRED[number]);
-    return rank < 0 ? HARVEY_INBOX_PREFERRED.length : rank;
+    const rank = PREFERRED_GENERAL_INBOX_LOCALS.indexOf(local as typeof PREFERRED_GENERAL_INBOX_LOCALS[number]);
+    return rank < 0 ? PREFERRED_GENERAL_INBOX_LOCALS.length : rank;
   };
   const score = (contact: PublicContact) => {
     const email = normalizeEmail(contact.email);
@@ -489,7 +497,7 @@ export function selectBestContactEmail(contacts: PublicContact[], officialDomain
     return (contact.status === 'verified' ? 40 : contact.status === 'possible' ? 20 : 0)
       + (sourceOfficial ? 35 : 0)
       + (official ? 70 : 0)
-      + Math.max(0, HARVEY_INBOX_PREFERRED.length - inboxRank(contact))
+      + Math.max(0, PREFERRED_GENERAL_INBOX_LOCALS.length - inboxRank(contact))
       + Math.round(contact.confidence * 20)
       + (thirdParty ? -35 : 0);
   };
@@ -558,7 +566,7 @@ export async function discoverContacts(lead: PublicLead): Promise<ContactDiscove
     // run; an unavailable or merely possible website result can be enriched.
     if (official.status === 'verified' && official.email) return official;
     if (publicSearchProvider() === 'harvey') {
-      const searched = await discoverFromHarveySearch(lead);
+      const searched = await discoverFromPublicSearch(lead);
       const contacts = dedupePublicContacts([...official.contacts, ...searched.contacts]);
       const best = selectBestContactEmail(contacts, officialDomain(lead));
       if (!best) return { ...official, email: '', status: official.email ? official.status : 'not_found', confidence: official.email ? official.confidence : 0, error: [official.error, searched.error].filter(Boolean).join('; '), diagnostic: searched.diagnostic, contacts };
@@ -579,6 +587,6 @@ export async function discoverContacts(lead: PublicLead): Promise<ContactDiscove
 import { isIP } from 'node:net';
 import { lookup } from 'node:dns/promises';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { execFile } from 'node:child_process';
 import { chromium } from 'playwright';

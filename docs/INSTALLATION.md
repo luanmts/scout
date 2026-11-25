@@ -45,13 +45,13 @@ Playwright is a declared production dependency. npm installation does not itself
 
 ## Optional Python bridge
 
-Python is not required to start Scout. It is only needed if enabling the optional contact-search bridge. The project declares `httpx` and `beautifulsoup4` in `scripts/requirements-harvey-search.txt`.
+Python is not required to start Scout. It is only needed if enabling the optional contact-search bridge. The project declares `httpx` and `beautifulsoup4` in `scripts/requirements-contact-search.txt`.
 
 This isolated setup was validated in a clean project copy. The Python suite passed all 7 tests using only the dependencies listed in the requirements file:
 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install -r scripts/requirements-harvey-search.txt
+python -m pip install -r scripts/requirements-contact-search.txt
 npm run test:python
 ```

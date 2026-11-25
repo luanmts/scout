@@ -6,21 +6,21 @@ import unittest
 
 
 SPEC = importlib.util.spec_from_file_location(
-    "harvey_search_bridge", "scripts/harvey-search-bridge.py"
+    "contact_search_bridge", "scripts/contact-search-bridge.py"
 )
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-class HarveySearchBridgeTests(unittest.TestCase):
+class ContactSearchBridgeTests(unittest.TestCase):
     def test_resolves_bing_redirect_before_identity_checks(self):
         target = "https://example.com/contact#fragment"
         token = "a1" + base64.urlsafe_b64encode(target.encode()).decode().rstrip("=")
         wrapped = f"https://www.bing.com/ck/a?u={token}"
-        self.assertEqual(MODULE.HarveyWebSearcher.normalize_result_url(wrapped), "https://example.com/contact")
+        self.assertEqual(MODULE.ContactSearchClient.normalize_result_url(wrapped), "https://example.com/contact")
 
     def test_rejects_homonym_without_name_or_location_evidence(self):
-        accepted, _, reason = MODULE.HarveyWebSearcher.relevance(
+        accepted, _, reason = MODULE.ContactSearchClient.relevance(
             {"url": "https://dictionary.example/discount", "title": "Discount definition", "snippet": "A reduction in price"},
             {"name": "Discount Mechanical Heating and Plumbing", "city": "Anchorage", "region": "Alaska", "domain": "discountmechanical.net"},
         )
@@ -28,7 +28,7 @@ class HarveySearchBridgeTests(unittest.TestCase):
         self.assertEqual(reason, "identity_tokens_insufficient")
 
     def test_continues_to_google_when_bing_has_only_irrelevant_results(self):
-        searcher = MODULE.HarveyWebSearcher()
+        searcher = MODULE.ContactSearchClient()
         os.environ["HARVEY_SEARCH_DELAY_MIN"] = "0"
 
         async def duck(_):
@@ -52,18 +52,18 @@ class HarveySearchBridgeTests(unittest.TestCase):
 
     def test_google_enablejs_interstitial_is_not_a_valid_empty_search(self):
         body = '<html><head><meta content="0;url=/httpservice/retry/enablejs?sei=abc"></head><body>Google Search<br>redirecionamento não iniciar em alguns segundos</body></html>'
-        self.assertTrue(MODULE.HarveyWebSearcher.requires_javascript("google_html", body))
-        self.assertFalse(MODULE.HarveyWebSearcher.requires_javascript("google_html", '<div class="g"><h3>Discount Mechanical</h3></div>'))
-        self.assertFalse(MODULE.HarveyWebSearcher.requires_javascript("bing_html", body))
+        self.assertTrue(MODULE.ContactSearchClient.requires_javascript("google_html", body))
+        self.assertFalse(MODULE.ContactSearchClient.requires_javascript("google_html", '<div class="g"><h3>Discount Mechanical</h3></div>'))
+        self.assertFalse(MODULE.ContactSearchClient.requires_javascript("bing_html", body))
 
     def test_serper_queries_remove_unsupported_quotes(self):
         self.assertEqual(
-            MODULE.HarveyWebSearcher.normalize_serper_query('"Discount Mechanical" "Anchorage" email'),
+            MODULE.ContactSearchClient.normalize_serper_query('"Discount Mechanical" "Anchorage" email'),
             "Discount Mechanical Anchorage email",
         )
 
     def test_http_400_is_non_retryable(self):
-        searcher = MODULE.HarveyWebSearcher()
+        searcher = MODULE.ContactSearchClient()
 
         async def request(*args, **kwargs):
             raise AssertionError("network client should not be replaced in this test")
@@ -90,7 +90,7 @@ class HarveySearchBridgeTests(unittest.TestCase):
         self.assertFalse(searcher.attempts[0]["retryable"])
 
     def test_provider_errors_are_independent(self):
-        searcher = MODULE.HarveyWebSearcher()
+        searcher = MODULE.ContactSearchClient()
         os.environ["HARVEY_SEARCH_DELAY_MIN"] = "0"
 
         async def duck(_):

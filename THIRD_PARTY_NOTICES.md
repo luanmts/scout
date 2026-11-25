@@ -6,8 +6,8 @@ The root [`LICENSE`](LICENSE) applies to original Scout-authored code only. It d
 
 The following materials retain the original MIT license and attribution notices from Ethan Rogers / the Harvey project:
 
-- `vendor/harvey/` — selective contact-discovery reuse. See `vendor/harvey/LICENSE`, `vendor/harvey/README.md`, and `vendor/harvey/SEARCH_LICENSE_NOTICE.txt`.
-- `skills/harvey/` — imported sales skills. See `skills/harvey/LICENSE` and `skills/harvey/README.md`.
+- `vendor/contact-discovery/` — selective contact-discovery reuse. See `vendor/contact-discovery/LICENSE`, `vendor/contact-discovery/README.md`, and `vendor/contact-discovery/SEARCH_LICENSE_NOTICE.txt`.
+- `skills/sales-intelligence/` — imported sales skills. See `skills/sales-intelligence/LICENSE` and `skills/sales-intelligence/README.md`.
 - Additional code adapted from Harvey is identified by source comments in `server/mail-providers.ts`, `server/outreach-outbox.ts`, and `server/website-intelligence.ts`. Preserve the Harvey MIT attribution and license when redistributing those portions.
 
 ## npm dependencies

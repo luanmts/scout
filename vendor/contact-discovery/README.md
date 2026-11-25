@@ -1,4 +1,4 @@
-# Selective Harvey contact-discovery reuse
+# Scout Contact Discovery — Harvey-derived reuse
 
 Scout reuses the conservative public-site contact rules from
 `ethanplusai/harvey` at commit `55866a1830ea73b7d96127b10dc7ad38b838a663`:
